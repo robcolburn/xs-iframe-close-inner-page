@@ -1,0 +1,47 @@
+<!-- Sample content for demonstration -->
+<p><a href="#" onclick="return setMessage();">Set Blocking Message</a></p>
+<p><a href="#" onclick="return unsetMessage();">Unset Blocking Message</a></p>
+ 
+<!-- Sample script for demonstration - see setMessageOnParent() function -->
+<script>
+ 
+try {
+  opera.setOverrideHistoryNavigationMode('compatible');
+  history.navigationMode = 'compatible';
+}
+catch(e){}
+ 
+var message = "Please do not close me :( ";
+var hasUnloadHandle = false;
+ 
+function setMessage () {
+  if (!hasUnloadHandle) {
+    window.onbeforeunload = onWindowUnload;
+    setMessageOnParent(message);
+    hasUnloadHandle = true;
+  }
+  return false;
+}
+function unsetMessage () {
+  if (hasUnloadHandle) {
+    window.onbeforeunload = null;
+    setMessageOnParent('');
+    hasUnloadHandle = false;
+  }
+  return false;
+}
+ 
+function setMessageOnParent (message) {
+  if (window.parent.postMessage) {
+    window.parent.postMessage('SetCloseConfirmEvent::::' + message, '*');
+  }
+}
+ 
+function onWindowUnload (event) {
+  if (event.returnVal) {
+    event.returnVal = message;
+  }
+  return message;
+}
+ 
+</script>
